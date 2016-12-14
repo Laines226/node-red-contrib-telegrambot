@@ -192,7 +192,53 @@ module.exports = function (RED) {
     }
     RED.nodes.registerType("telegram receiver", TelegramInNode);
     
-    
+    // --------------------------------------------------------------------------------------------
+    // The input node receives callback from the chat.
+    // the callback details are stored in the playload
+    // chatId
+    // type
+    // content
+    // depending on type caption and date is part of the output, too.
+    // The original message is stored next to payload.
+    // 
+    // The message ist send to output 1 if the message is from an authorized user
+    // and to output2 if the message is not from an authorized user.
+    function TelegramCallbackInNode(config) {
+        RED.nodes.createNode(this, config);
+        var node = this;
+        this.bot = config.bot;
+        
+        this.config = RED.nodes.getNode(this.bot);
+        if (this.config) {
+            this.status({ fill: "red", shape: "ring", text: "disconnected" });
+            
+            node.telegramBot = this.config.telegramBot;
+            if (node.telegramBot) {
+                this.status({ fill: "green", shape: "ring", text: "connected" });
+                
+                node.telegramBot.on('callback_query', function (botMsg) {
+                    var username = botMsg.from.username;
+                    var chatid = botMsg.chat.id;
+                    var messageDetails = getMessageDetails(botMsg);
+                    if (messageDetails) {
+                        var msg = { payload: messageDetails, originalMessage: botMsg };
+                        
+                        if (node.config.isAuthorized(chatid, username)) {
+                            node.send([msg, null]);
+                        } else {
+                            // node.warn("Unauthorized incoming call from " + username);
+                            node.send([null, msg]);
+                        }
+                    }
+                });
+            } else {
+                node.warn("no bot in config.");
+            }
+        } else {
+            node.warn("no config.");
+        }
+    }
+    RED.nodes.registerType("telegram callback receiver", TelegramCallbackInNode);
     
     // --------------------------------------------------------------------------------------------
     // The input node receives a command from the chat.

@@ -128,6 +128,7 @@ module.exports = function (RED) {
         } else if (botMsg.contact) {
             messageDetails = { chatId: botMsg.chat.id, messageId: botMsg.message_id, type: 'contact', content: botMsg.contact };
         } else {
+            messageDetails = { message: botMsg };
                             // unknown type --> no output
         }
         

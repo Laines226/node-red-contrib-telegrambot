@@ -218,17 +218,19 @@ module.exports = function (RED) {
                 
                 node.telegramBot.on('callback_query', function (botMsg) {
                     var username = botMsg.from.username;
-                    var chatid = botMsg.chat.id;
-                    var messageDetails = getMessageDetails(botMsg);
-                    if (messageDetails) {
-                        var msg = { payload: messageDetails, originalMessage: botMsg };
+                    var queryid = botMsg.id;
+                    if (botMsg) {
+                        var msg = { payload: botMsg };
                         
-                        if (node.config.isAuthorized(chatid, username)) {
+                        if (node.config.isAuthorized(queryid, username)) {
                             node.send([msg, null]);
                         } else {
                             // node.warn("Unauthorized incoming call from " + username);
                             node.send([null, msg]);
                         }
+                    }
+                    else{
+                        node.warn("Callback Query" + username);
                     }
                 });
             } else {

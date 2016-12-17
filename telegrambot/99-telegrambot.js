@@ -41,7 +41,7 @@ module.exports = function (RED) {
         
         
         this.on('close', function (done) {
-            if (self.telegramBot != null && self.telegramBot._polling) {
+            if (self.telegramBot !== null && self.telegramBot._polling) {
                 self.telegramBot.stopPolling()
                     .then(function () {
                     self.telegramBot = null;
@@ -62,7 +62,7 @@ module.exports = function (RED) {
             }
             
             return isAuthorized;
-        }
+        };
         
         this.isAuthorizedChat = function (chatid) {
             var isAuthorized = false;
@@ -78,7 +78,7 @@ module.exports = function (RED) {
             }
             
             return isAuthorized;
-        }
+        };
         
         this.isAuthorized = function (chatid, user) {
             var isAuthorizedUser = self.isAuthorizedUser(user);
@@ -89,13 +89,13 @@ module.exports = function (RED) {
             if (isAuthorizedUser || isAuthorizedChatId) {
                 isAuthorized = true;
             } else {
-                if (self.chatids.length == 0 && self.usernames.length == 0) {
+                if (self.chatids.length === 0 && self.usernames.length === 0) {
                     isAuthorized = true;
                 }
             }
             
             return isAuthorized;
-        }
+       };
     }
     RED.nodes.registerType("telegram bot", TelegramBotNode, {
         credentials: {
@@ -217,7 +217,6 @@ module.exports = function (RED) {
                 this.status({ fill: "green", shape: "ring", text: "connected" });
                 
                 node.telegramBot.on('callback_query', function (botMsg) {
-                    var username = botMsg.from.username;
                     var queryid = botMsg.id;
                     if (botMsg) {
                         var msg = { payload: botMsg };
@@ -230,7 +229,7 @@ module.exports = function (RED) {
                         }
                     }
                     else{
-                        node.warn("Callback Query" + username);
+                        node.warn("Callback Query" + botMsg);
                     }
                 });
             } else {
@@ -376,7 +375,7 @@ module.exports = function (RED) {
                                             node.send(msg);
                                         });
 
-                                    } while (!done)
+                                    } while (!done);
                                     
                                     
                                     break;
@@ -505,6 +504,6 @@ module.exports = function (RED) {
         });
     }
     RED.nodes.registerType("telegram reply", TelegramReplyNode);
-}
+};
 
 
